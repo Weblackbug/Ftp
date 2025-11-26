@@ -1,0 +1,16 @@
+# Build artifacts
+build/
+*.obj
+*.exe
+*.pdb
+*.log
+# VS Code settings
+.vscode/
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+# Misc
+*.tmp
+*.bak

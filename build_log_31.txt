@@ -1,0 +1,34 @@
+Compiling FTP Uploader...
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.0.0
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[DEBUG:ext\vcvars.bat] Found potential v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[DEBUG:ext\vcvars.bat] Testing v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[vcvarsall.bat] Environment initialized for: 'x64'
+Microsoft (R) Windows (R) Resource Compiler Version 10.0.10011.16384
+
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Compilador de optimización de C/C++ de Microsoft (R) versión 19.50.35717 para x64
+(C) Microsoft Corporation. Todos los derechos reservados.
+
+main.cpp
+ftp_uploader.cpp
+config_manager.cpp
+Generando código...
+Microsoft (R) Incremental Linker Version 14.50.35717.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:FtpUploader.exe 
+main.obj 
+ftp_uploader.obj 
+config_manager.obj 
+resource.res 
+user32.lib 
+gdi32.lib 
+comctl32.lib 
+comdlg32.lib 
+LINK : fatal error LNK1104: no se puede abrir el archivo 'FtpUploader.exe'
+Build failed.

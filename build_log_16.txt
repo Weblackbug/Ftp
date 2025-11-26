@@ -1,0 +1,64 @@
+Compiling FTP Uploader...
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.0.0
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[DEBUG:ext\vcvars.bat] Found potential v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[DEBUG:ext\vcvars.bat] Testing v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[vcvarsall.bat] Environment initialized for: 'x64'
+Microsoft (R) Windows (R) Resource Compiler Version 10.0.10011.16384
+
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+
+resource.rc(2) : error RC2135 : file not found: E&xit
+
+
+resource.rc(3) : error RC2135 : file not found: END
+
+
+resource.rc(6) : error RC2164 : unexpected value in RCDATA
+
+
+resource.rc(6) : error RC2135 : file not found: IDM_ABOUT
+
+
+resource.rc(9) : error RC2135 : file not found: END
+
+Compilador de optimización de C/C++ de Microsoft (R) versión 19.50.35717 para x64
+(C) Microsoft Corporation. Todos los derechos reservados.
+
+main.cpp
+main.cpp(3): error C4430: falta el especificador de tipo; se presupone int. Nota: C++ no admite default-int
+main.cpp(3): error C2065: 'WS_OVERLAPPED': identificador no declarado
+main.cpp(3): error C2065: 'WS_CAPTION': identificador no declarado
+main.cpp(3): error C2065: 'WS_SYSMENU': identificador no declarado
+main.cpp(3): error C2065: 'WS_MINIMIZEBOX': identificador no declarado
+main.cpp(4): error C2065: 'xPos': identificador no declarado
+main.cpp(4): error C2065: 'yPos': identificador no declarado
+main.cpp(4): error C2065: 'windowWidth': identificador no declarado
+main.cpp(4): error C2065: 'windowHeight': identificador no declarado
+main.cpp(4): error C2065: 'NULL': identificador no declarado
+main.cpp(4): error C2065: 'NULL': identificador no declarado
+main.cpp(4): error C2065: 'hInstance': identificador no declarado
+main.cpp(4): error C2065: 'NULL': identificador no declarado
+main.cpp(3): error C3861: 'CreateWindow': no se encontró el identificador
+main.cpp(6): error C2059: error de sintaxis: 'if'
+main.cpp(19): error C2065: 'nCmdShow': identificador no declarado
+main.cpp(19): error C4430: falta el especificador de tipo; se presupone int. Nota: C++ no admite default-int
+main.cpp(19): error C2440: 'inicializando': no se puede realizar la conversión de 'initializer list' a 'int'
+main.cpp(19): note: El inicializador contiene demasiados elementos
+main.cpp(20): error C4430: falta el especificador de tipo; se presupone int. Nota: C++ no admite default-int
+main.cpp(22): error C4430: falta el especificador de tipo; se presupone int. Nota: C++ no admite default-int
+main.cpp(22): error C2146: error de sintaxis: falta ';' delante del identificador 'msg'
+main.cpp(23): error C2059: error de sintaxis: 'while'
+main.cpp(23): error C2143: error de sintaxis: falta ';' delante de '{'
+main.cpp(23): error C2447: '{': falta el encabezado de función (¿lista formal de estilo anterior?)
+main.cpp(28): error C2059: error de sintaxis: 'return'
+main.cpp(29): error C2059: error de sintaxis: '}'
+main.cpp(29): error C2143: error de sintaxis: falta ';' delante de '}'
+ftp_uploader.cpp
+config_manager.cpp
+Generando código...
+Build failed.

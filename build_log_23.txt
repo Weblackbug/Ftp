@@ -1,0 +1,25 @@
+Compiling FTP Uploader...
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.0.0
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[DEBUG:ext\vcvars.bat] Found potential v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[DEBUG:ext\vcvars.bat] Testing v145 version file: 'Microsoft.VCToolsVersion.VC.14.50.18.0.txt'
+[vcvarsall.bat] Environment initialized for: 'x64'
+Microsoft (R) Windows (R) Resource Compiler Version 10.0.10011.16384
+
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Compilador de optimización de C/C++ de Microsoft (R) versión 19.50.35717 para x64
+(C) Microsoft Corporation. Todos los derechos reservados.
+
+main.cpp
+C:\Users\Sergi Serrano\Desktop\c++ftp\ftp_uploader.h(45): error C2535: 'bool FtpUploader::DownloadDirectory(const std::string &,const std::string &,ProgressCallback)': función miembro ya definida o declarada
+C:\Users\Sergi Serrano\Desktop\c++ftp\ftp_uploader.h(24): note: vea la declaración de 'FtpUploader::DownloadDirectory'
+ftp_uploader.cpp
+C:\Users\Sergi Serrano\Desktop\c++ftp\ftp_uploader.h(45): error C2535: 'bool FtpUploader::DownloadDirectory(const std::string &,const std::string &,ProgressCallback)': función miembro ya definida o declarada
+C:\Users\Sergi Serrano\Desktop\c++ftp\ftp_uploader.h(24): note: vea la declaración de 'FtpUploader::DownloadDirectory'
+config_manager.cpp
+Generando código...
+Build failed.

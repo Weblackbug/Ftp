@@ -1,0 +1,35 @@
+#include "resource.h"
+#include <windows.h>
+IDI_BLOG_ICON ICON "blog_new.ico"
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Abrir &ZIP...para subir Blog", IDM_FILE_OPEN_ZIP
+        MENUITEM SEPARATOR
+        MENUITEM "Descargar blog en &ZIP...", IDM_FILE_DOWNLOAD_ZIP
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit", IDM_FILE_EXIT
+    END
+    POPUP "&Config"
+    BEGIN
+        MENUITEM "&Configuracion...", IDM_CONFIG_SETTINGS
+    END
+    POPUP "&Info"
+    BEGIN
+        MENUITEM "&Acerca de...", IDM_HELP_ABOUT
+    END
+END
+
+IDD_ABOUT DIALOGEX 0, 0, 225, 225
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Acerca de"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDI_BLOG_ICON, IDC_STATIC, 102,110,20,20
+    LTEXT           "Subida de archivos al Personal_BLOG 1.0",IDC_STATIC,10,10,205,20
+    LTEXT           "By Sergi Serrano Perez , WeBlackbug 1989 - 2025",IDC_STATIC,10,40,205,20
+    LTEXT           "( Canovelles - Granollers )",IDC_STATIC,10,70,205,20
+    DEFPUSHBUTTON   "OK",IDOK,87,200,50,14
+END

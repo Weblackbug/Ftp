@@ -1,0 +1,7 @@
+{
+  "host": "YOUR_HOST_HERE",
+  "user": "YOUR_USER_HERE",
+  "pass": "YOUR_PASSWORD_HERE",
+  "localDir": "C:\\xampp\\htdocs\\canal_k",
+  "remoteDir": "hola"
+}
