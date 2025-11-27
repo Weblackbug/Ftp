@@ -3,7 +3,8 @@
 // Archivo: ftp_uploader.cpp                                                       //
 // Licencia: Libre distribución.                                                   //
 /////////////////////////////////////////////////////////////////////////////////////
-
+// Fet a Canyamars - DosRius
+//
 #include "ftp_uploader.h"
 #include <filesystem>
 #include <iostream>
