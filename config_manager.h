@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////////////
+// Autor: Sergi Serrano Pérez , WeBlackbug 1987 - 2024 Canovelles - Granollers..   //
+// Archivo: config_manager.h                                                       //
+// Licencia: Libre distribución.                                                   //
+/////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 #include <string>
 

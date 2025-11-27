@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////////////
+// Autor: Sergi Serrano Pérez , WeBlackbug 1987 - 2024 Canovelles - Granollers..   //
+// Archivo: ftp_uploader.cpp                                                       //
+// Licencia: Libre distribución.                                                   //
+/////////////////////////////////////////////////////////////////////////////////////
+
 #include "ftp_uploader.h"
 #include <filesystem>
 #include <iostream>
@@ -20,11 +26,11 @@ bool FtpUploader::UploadDirectory(const std::string& localDir, const std::string
     std::vector<std::string> directories;
     std::vector<FileTask> files;
 
-    // 1. Collect all work
-    directories.push_back(remoteDir); // Ensure base dir is created
+    // 1. Recollir tota la feina
+    directories.push_back(remoteDir); // Assegurar que el directori base es crea
     CollectFiles(localDir, remoteDir, directories, files, stats);
 
-    // 2. Execute Batch
+    // 2. Executar Lot
     return ExecuteBatchUpload(directories, files, stats, callback);
 }
 
@@ -51,34 +57,20 @@ bool FtpUploader::ExecuteBatchUpload(const std::vector<std::string>& directories
     if (host.find("sftp://") == 0) host = host.substr(7);
     std::string fingerprint = "ssh-ed25519 255 SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q";
 
-    // 1. Create Directories (Batching Plink commands)
-    // Windows command line limit is ~8191 chars. Let's be safe with 6000.
+    // 1. Crear Directoris (Agrupant comandes Plink)
+    // El límit de la línia de comandes de Windows és ~8191 caràcters. Anem segurs amb 6000.
     std::string currentCmdGroup;
     
-    // Ensure base directory exists first
-    // Extract base remote dir from the first file or just use the passed remoteDir?
-    // The passed 'directories' vector contains full paths.
-    // We should probably add the base remoteDir to the list or just mkdir it.
-    // However, ExecuteBatchUpload doesn't take remoteDir as arg, it takes lists.
-    // Wait, UploadDirectory calls CollectFiles then ExecuteBatchUpload.
-    // I should modify UploadDirectory to pass remoteDir to ExecuteBatchUpload or just add it to 'directories'.
+    // Assegurar que el directori base existeix primer
     
-    // Let's modify UploadDirectory to add the base dir to 'directories' list.
-    // But wait, ExecuteBatchUpload is here.
-    // Let's look at UploadDirectory in this file.
-    // It calls CollectFiles.
-    
-    // Actually, simpler to just modify UploadDirectory to push remoteDir to 'directories' vector.
-    // But I am editing ExecuteBatchUpload here.
-    // Let's go to UploadDirectory instead.
     
     for (const auto& dir : directories) {
         std::string mkdirCmd = "mkdir -p \"" + dir + "\"; ";
         if (currentCmdGroup.length() + mkdirCmd.length() > 6000) {
-            // Execute current chunk
+            // Executar fragment actual
              std::stringstream cmd;
              cmd << "plink.exe -ssh -pw \"" << m_pass << "\" -batch -hostkey \"" << fingerprint << "\" \"" << m_user << "@" << host << "\" \"" << currentCmdGroup << "\"";
-             // We don't check result strictly as dirs might exist
+             // No comprovem el resultat estrictament ja que els directoris podrien existir
              system(cmd.str().c_str()); 
              currentCmdGroup = "";
         }
@@ -90,7 +82,7 @@ bool FtpUploader::ExecuteBatchUpload(const std::vector<std::string>& directories
          system(cmd.str().c_str());
     }
 
-    // 2. Generate PSFTP Script
+    // 2. Generar Script PSFTP
     std::string scriptFilename = "upload_script.scr";
     std::ofstream script(scriptFilename);
     if (!script.is_open()) {
@@ -103,11 +95,11 @@ bool FtpUploader::ExecuteBatchUpload(const std::vector<std::string>& directories
     }
     script.close();
 
-    // 3. Execute PSFTP
+    // 3. Executar PSFTP
     std::stringstream psftpCmd;
     psftpCmd << "psftp.exe -pw \"" << m_pass << "\" -batch -hostkey \"" << fingerprint << "\" -b " << scriptFilename << " \"" << m_user << "@" << host << "\"";
     
-    // Capture output to update progress
+    // Capturar sortida per actualitzar progrés
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
     sa.bInheritHandle = TRUE;
@@ -124,7 +116,7 @@ bool FtpUploader::ExecuteBatchUpload(const std::vector<std::string>& directories
     si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
     si.wShowWindow = SW_HIDE;
     si.hStdOutput = hStdOutWr;
-    si.hStdError = hStdOutWr; // Capture stderr too
+    si.hStdError = hStdOutWr; // Capturar stderr també
 
     ZeroMemory(&pi, sizeof(pi));
     std::string cmdLine = psftpCmd.str();
@@ -147,21 +139,21 @@ bool FtpUploader::ExecuteBatchUpload(const std::vector<std::string>& directories
                 std::string line = lineBuffer.substr(0, pos);
                 lineBuffer.erase(0, pos + 1);
                 
-                // Parse line to find what's happening
-                // psftp output for put: "remote:/path/to/file" or "local:..." -> "remote:..."
-                // Simple heuristic: if line contains " => ", it's a transfer
+                // Analitzar línia per veure què passa
+                // sortida psftp per put: "remote:/path/to/file" o "local:..." -> "remote:..."
+                // Heurística simple: si la línia conté " => ", és una transferència
                 if (line.find(" => ") != std::string::npos) {
-                    // Extract filename?
+                    // Extreure nom de fitxer?
                     // Format: "local_file => remote_file"
-                    // Let's just take the current file from our list if we can track it, 
-                    // or just increment counter.
-                    // Since psftp executes in order, we can try to match, but simple counter is safer.
+                    // Agafem el fitxer actual de la nostra llista si podem rastrejar-lo, 
+                    // o simplement incrementem el comptador.
+                    // Com que psftp executa en ordre, podem intentar coincidir, però un comptador simple és més segur.
                     stats.uploadedFiles++;
-                    // Try to find the filename in the line for display
+                    // Intentar trobar el nom del fitxer a la línia per mostrar
                     size_t arrowPos = line.find(" => ");
                     if (arrowPos != std::string::npos) {
                         std::string remotePart = line.substr(arrowPos + 4);
-                        // Extract just the filename
+                        // Extreure només el nom del fitxer
                         size_t slashPos = remotePart.find_last_of('/');
                         if (slashPos != std::string::npos) {
                             stats.currentFile = remotePart.substr(slashPos + 1);
@@ -193,7 +185,7 @@ bool FtpUploader::DownloadDirectory(const std::string& remoteDir, const std::str
     if (host.find("sftp://") == 0) host = host.substr(7);
     std::string fingerprint = "ssh-ed25519 255 SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q";
 
-    // Generate PSFTP Script for Download
+    // Generar Script PSFTP per Descàrrega
     std::string scriptFilename = "download_script.scr";
     std::ofstream script(scriptFilename);
     if (!script.is_open()) {
@@ -201,17 +193,17 @@ bool FtpUploader::DownloadDirectory(const std::string& remoteDir, const std::str
         return false;
     }
 
-    // Use lcd to set local dir, then cd to remote and mget -r * to download contents
+    // Utilitzar lcd per establir directori local, després cd al remot i mget -r * per descarregar contingut
     script << "lcd \"" << localDir << "\"" << std::endl;
     script << "cd \"" << remoteDir << "\"" << std::endl;
     script << "mget -r *" << std::endl;
     script.close();
 
-    // Execute PSFTP
+    // Executar PSFTP
     std::stringstream psftpCmd;
     psftpCmd << "psftp.exe -pw \"" << m_pass << "\" -batch -hostkey \"" << fingerprint << "\" -b " << scriptFilename << " \"" << m_user << "@" << host << "\"";
 
-    // Capture output
+    // Capturar sortida
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
     sa.bInheritHandle = TRUE;
@@ -253,19 +245,19 @@ bool FtpUploader::DownloadDirectory(const std::string& remoteDir, const std::str
                 std::string line = lineBuffer.substr(0, pos);
                 lineBuffer.erase(0, pos + 1);
 
-                // Parse output for progress
+                // Analitzar sortida per progrés
                 // psftp download output: "remote:/path/to/file => local:file"
                 // or "remote:file => local:file"
                 if (line.find(" => ") != std::string::npos) {
-                    stats.uploadedFiles++; // Reuse this counter for downloaded files
+                    stats.uploadedFiles++; // Reutilitzar aquest comptador per fitxers descarregats
                     
                     size_t arrowPos = line.find(" => ");
                     if (arrowPos != std::string::npos) {
                         std::string remotePart = line.substr(0, arrowPos);
-                        // Remove "remote:" prefix if present (psftp sometimes adds it)
+                        // Eliminar prefix "remote:" si està present (psftp de vegades l'afegeix)
                         if (remotePart.find("remote:") == 0) remotePart = remotePart.substr(7);
 
-                        // Extract filename
+                        // Extreure nom de fitxer
                         size_t slashPos = remotePart.find_last_of('/');
                         if (slashPos != std::string::npos) {
                             stats.currentFile = remotePart.substr(slashPos + 1);
@@ -311,30 +303,30 @@ bool FtpUploader::RemoteDirectoryExists(const std::string& remoteDir) {
     }
     _pclose(pipe);
 
-    // Debug logging
+    // Registre de depuració
     std::ofstream log("dir_check_debug.txt", std::ios::app);
     log << "Cmd: " << cmd.str() << "\n";
     log << "Result: " << result << "\n";
     log.close();
 
-    // Check if result contains the directory name (or part of it) and NOT "No such file"
-    // Also handle "cannot access" etc.
-    // Simplest: if it returns the directory name, it exists.
+    // Comprovar si el resultat conté el nom del directori (o part d'ell) i NO "No such file"
+    // També gestionar "cannot access", etc.
+    // Més simple: si retorna el nom del directori, existeix.
     // But ls -d /hola returns /hola
     // ls -d /invalid returns "ls: cannot access '/invalid': No such file or directory"
     
-    // Check if result contains "No such file" or "cannot access"
+    // Comprovar si el resultat conté "No such file" o "cannot access"
     if (result.find("No such file") != std::string::npos || result.find("cannot access") != std::string::npos || result.find("does not exist") != std::string::npos) {
         return false;
     }
     
-    // If result is empty, something is wrong (connection failed?), assume false
+    // Si el resultat és buit, alguna cosa va malament (connexió fallida?), assumir fals
     if (result.empty()) return false;
 
     return true;
 }
 
-// Unused in batch mode but kept for interface compatibility if needed, or can be removed.
+// No utilitzat en mode lot però mantingut per compatibilitat d'interfície si cal, o es pot eliminar.
 bool FtpUploader::UploadRecursive(const std::string& localPath, const std::string& remotePath, UploadStats& stats, ProgressCallback callback) {
     return true; 
 }

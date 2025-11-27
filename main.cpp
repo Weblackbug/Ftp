@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////////////
+// Autor: Sergi Serrano Pérez , WeBlackbug 1987 - 2024 Canovelles - Granollers..   //
+// Archivo: main.cpp                                                               //
+// Licencia: Libre distribución.                                                   //
+/////////////////////////////////////////////////////////////////////////////////////
+
 #include <windows.h>
 #include <commctrl.h>
 #include <string>
@@ -15,19 +21,19 @@
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "comctl32.lib")
 
-// Global Variables
+// Variables Globals
 HINSTANCE hInst;
 HWND hMainWindow;
 HWND hUploadBtn;
 HWND hProgressBar;
 HWND hStatusLabel;
 
-// Configuration and State
+// Configuració i Estat
 AppConfig g_config;
 std::string g_selectedZip = "";
 std::string g_downloadZipPath = "";
 
-// Forward declarations
+// Declaracions anticipades
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK SettingsDlg(HWND, UINT, WPARAM, LPARAM);
@@ -37,35 +43,39 @@ unsigned __stdcall DownloadThread(void* pArgs);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     hInst = hInstance;
     
-    // Initialize Common Controls
+    // Inicialitzar Controls Comuns
     INITCOMMONCONTROLSEX icex;
     icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
-    icex.dwICC = ICC_WIN95_CLASSES | ICC_BAR_CLASSES; // Progress bar needs this
+    icex.dwICC = ICC_WIN95_CLASSES | ICC_BAR_CLASSES; // La barra de progrés necessita això
     if (!InitCommonControlsEx(&icex)) {
         MessageBoxA(NULL, "InitCommonControlsEx Failed!", "Error", MB_OK | MB_ICONERROR);
         return 1;
     }
 
-    // Load Config
+    // Carregar Configuració
     g_config = ConfigManager::LoadConfig("config.json");
 
-    // Register Class
-    WNDCLASSEXA wcex;
-    wcex.cbSize = sizeof(WNDCLASSEX);
+    // Registrar Classe
+    WNDCLASSEXA wcex = {0};
+    wcex.cbSize = sizeof(WNDCLASSEXA);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = WndProc;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_BLOG_ICON)); // Use custom blog icon
-    wcex.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_BLOG_ICON)); // Small icon
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_BLOG_ICON));
+    wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = MAKEINTRESOURCEA(IDR_MENU1);
+    wcex.lpszClassName = "FtpUploaderClass";
+    wcex.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_BLOG_ICON));
 
     if (!RegisterClassExA(&wcex)) {
         MessageBoxA(NULL, ("RegisterClassEx Failed! Error: " + std::to_string(GetLastError())).c_str(), "Error", MB_OK | MB_ICONERROR);
         return 1;
     }
 
-    // Create Window (Centered, 400x250)
+    // Crear Finestra (Centrada, 400x250)
     int width = 400;
     int height = 250;
     int x = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
@@ -95,15 +105,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     switch (message) {
     case WM_CREATE:
     {
-        // Button
+        // Botó
         hUploadBtn = CreateWindowA("BUTTON", "Subir blog", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
             140, 150, 100, 30, hWnd, (HMENU)1, hInst, NULL);
 
-        // Status Label
+        // Etiqueta d'Estat
         hStatusLabel = CreateWindowA("STATIC", "Listo.", WS_VISIBLE | WS_CHILD | SS_CENTER,
             10, 120, 360, 20, hWnd, (HMENU)2, hInst, NULL);
 
-        // Progress Bar
+        // Barra de Progrés
         hProgressBar = CreateWindowExA(0, PROGRESS_CLASS, NULL, WS_CHILD | WS_VISIBLE,
             10, 80, 360, 30, hWnd, (HMENU)3, hInst, NULL);
         SendMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, 100));
@@ -118,7 +128,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, About);
             break;
         case IDM_CONFIG_SETTINGS:
-            DialogBox(hInst, MAKEINTRESOURCE(IDD_SETTINGS), hWnd, SettingsDlg);
+            {
+                // Depuració: Comprovar si arribem aquí
+                // MessageBoxA(hWnd, "Opening Settings Dialog...", "Debug", MB_OK);
+                
+                INT_PTR result = DialogBox(hInst, MAKEINTRESOURCE(IDD_SETTINGS), hWnd, SettingsDlg);
+                
+                if (result == -1) {
+                    std::string err = "DialogBox Failed! Error: " + std::to_string(GetLastError());
+                    MessageBoxA(hWnd, err.c_str(), "Error", MB_OK | MB_ICONERROR);
+                }
+            }
             break;
         case IDM_FILE_OPEN_ZIP:
         {
@@ -160,7 +180,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         case IDM_FILE_EXIT:
             DestroyWindow(hWnd);
             break;
-        case 1: // Upload Button
+        case 1: // Botó de Pujada
             _beginthreadex(NULL, 0, UploadThread, NULL, 0, NULL);
             break;
         }
@@ -179,7 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 // ...
 
-// Helper to zip directory recursively
+// Ajudant per comprimir directori recursivament
 bool CreateZipFromDirectory(const std::string& sourceDir, const std::string& zipFile) {
     mz_zip_archive zip_archive;
     memset(&zip_archive, 0, sizeof(zip_archive));
@@ -188,13 +208,13 @@ bool CreateZipFromDirectory(const std::string& sourceDir, const std::string& zip
         return false;
     }
 
-    // Iterate recursively
+    // Iterar recursivament
     for (const auto& entry : std::filesystem::recursive_directory_iterator(sourceDir)) {
         if (entry.is_regular_file()) {
             std::string filePath = entry.path().string();
             std::string relativePath = std::filesystem::relative(entry.path(), sourceDir).string();
             
-            // Replace backslashes with forward slashes for zip standard
+            // Reemplaçar barres invertides per barres normals per l'estàndard zip
             std::replace(relativePath.begin(), relativePath.end(), '\\', '/');
 
             if (!mz_zip_writer_add_file(&zip_archive, relativePath.c_str(), filePath.c_str(), NULL, 0, MZ_DEFAULT_LEVEL)) {
@@ -217,17 +237,17 @@ unsigned __stdcall DownloadThread(void* pArgs) {
     EnableWindow(hUploadBtn, FALSE);
     SetWindowTextA(hStatusLabel, "Preparando descarga...");
     
-    // Set Marquee Progress Bar - REMOVED per user request
+    // Establir Barra de Progrés Marquee - ELIMINAT per petició de l'usuari
     // SetWindowLong(hProgressBar, GWL_STYLE, GetWindowLong(hProgressBar, GWL_STYLE) | PBS_MARQUEE);
     // SendMessage(hProgressBar, PBM_SETMARQUEE, (WPARAM)TRUE, (LPARAM)30);
 
     FtpUploader uploader(g_config.host, g_config.user, g_config.pass);
     
-    // Use absolute path for temp dir to avoid ambiguity
+    // Utilitzar ruta absoluta per al directori temporal per evitar ambigüitats
     std::filesystem::path tempPath = std::filesystem::absolute("temp_download_blog");
     std::string tempDir = tempPath.string();
     
-    // Create temp dir
+    // Crear directori temporal
     if (std::filesystem::exists(tempPath)) std::filesystem::remove_all(tempPath);
     std::filesystem::create_directory(tempPath);
 
@@ -238,24 +258,24 @@ unsigned __stdcall DownloadThread(void* pArgs) {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdate).count();
         
-        // Throttle updates to ~100ms (10fps) unless it's the first few files
+        // Limitar actualitzacions a ~100ms (10fps) a menys que siguin els primers fitxers
         if (elapsed < 100 && stats.uploadedFiles > 5) return true;
 
         lastUpdate = now;
         
-        // Calculate ETR
+        // Calcular ETR
         auto totalElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
         std::string etrStr = "--:--";
         
         if (totalElapsed > 0 && stats.uploadedFiles > 0) {
             double filesPerSec = (double)stats.uploadedFiles / totalElapsed;
             if (filesPerSec > 0) {
-                long long remainingFiles = 0; // Unknown for download usually, but if we knew total...
-                // For download, psftp doesn't give total files easily upfront without a separate listing.
-                // So we might just show elapsed time or speed.
-                // However, if we assume user wants "Time Remaining", we need total.
-                // In DownloadDirectory, we don't know totalFiles initially.
-                // Let's just show Elapsed Time for Download, and ETR for Upload (where we know total).
+                long long remainingFiles = 0; // Desconegut per descàrrega normalment, però si sabéssim el total...
+                // Per descàrrega, psftp no dóna el total de fitxers fàcilment per endavant sense un llistat separat.
+                // Així que podríem mostrar només el temps transcorregut o la velocitat.
+                // Tanmateix, si assumim que l'usuari vol "Temps Restant", necessitem el total.
+                // A DownloadDirectory, no sabem totalFiles inicialment.
+                // Mostrem només el Temps Transcorregut per Descàrrega, i ETR per Pujada (on sabem el total).
                 
                 long long minutes = totalElapsed / 60;
                 long long seconds = totalElapsed % 60;
@@ -277,11 +297,11 @@ unsigned __stdcall DownloadThread(void* pArgs) {
     if (uploader.DownloadDirectory("/", tempDir, callback)) {
         SetWindowTextA(hStatusLabel, "Comprimiendo ZIP (Nativo)...");
         
-        // Zip using miniz (Native)
+        // Comprimir usant miniz (Natiu)
         bool success = CreateZipFromDirectory(tempDir, g_downloadZipPath);
         int result = success ? 0 : 1;
 
-        // Stop Marquee - REMOVED
+        // Aturar Marquee - ELIMINAT
         // SendMessage(hProgressBar, PBM_SETMARQUEE, (WPARAM)FALSE, 0);
         // SetWindowLong(hProgressBar, GWL_STYLE, GetWindowLong(hProgressBar, GWL_STYLE) & ~PBS_MARQUEE);
         SendMessage(hProgressBar, PBM_SETPOS, 100, 0);
@@ -294,7 +314,7 @@ unsigned __stdcall DownloadThread(void* pArgs) {
             SetWindowTextA(hStatusLabel, "Error en compresion.");
         }
     } else {
-        // Stop Marquee - REMOVED
+        // Aturar Marquee - ELIMINAT
         // SendMessage(hProgressBar, PBM_SETMARQUEE, (WPARAM)FALSE, 0);
         // SetWindowLong(hProgressBar, GWL_STYLE, GetWindowLong(hProgressBar, GWL_STYLE) & ~PBS_MARQUEE);
         SendMessage(hProgressBar, PBM_SETPOS, 0, 0);
@@ -304,7 +324,7 @@ unsigned __stdcall DownloadThread(void* pArgs) {
         SetWindowTextA(hStatusLabel, "Error en descarga.");
     }
 
-    // Cleanup
+    // Neteja
     // std::filesystem::remove_all(tempPath);
     EnableWindow(hUploadBtn, TRUE);
     return 0;
@@ -321,10 +341,10 @@ unsigned __stdcall UploadThread(void* pArgs) {
 
     if (isZip) {
         SetWindowTextA(hStatusLabel, "Descomprimiendo ZIP...");
-        // Create temp dir
+        // Crear directori temporal
         std::filesystem::create_directory(tempDir);
         
-        // Unzip using tar
+        // Descomprimir usant tar
         std::string cmd = "tar -xf \"" + g_selectedZip + "\" -C \"" + tempDir + "\"";
         system(cmd.c_str());
         
@@ -338,16 +358,16 @@ unsigned __stdcall UploadThread(void* pArgs) {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdate).count();
 
-        // Throttle updates to ~100ms
+        // Limitar actualitzacions a ~100ms
         if (elapsed < 100 && stats.uploadedFiles < stats.totalFiles) return true;
 
         lastUpdate = now;
 
-        // Calculate ETR
+        // Calcular ETR
         auto totalElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
         std::string timeStr = "Calculando...";
 
-        if (totalElapsed > 2 && stats.uploadedFiles > 0) { // Wait 2s for stable speed
+        if (totalElapsed > 2 && stats.uploadedFiles > 0) { // Esperar 2s per velocitat estable
             double filesPerSec = (double)stats.uploadedFiles / totalElapsed;
             if (filesPerSec > 0) {
                 long long remainingFiles = stats.totalFiles - stats.uploadedFiles;
@@ -371,7 +391,7 @@ unsigned __stdcall UploadThread(void* pArgs) {
         return true; // Continue
     };
 
-    // Check if remote directory exists
+    // Comprovar si el directori remot existeix
     SetWindowTextA(hStatusLabel, "Verificando directorio remoto...");
     if (!uploader.RemoteDirectoryExists(g_config.remoteDir)) {
         std::string msg = "El directorio remoto '" + g_config.remoteDir + "' no existe.\n¿Desea crearlo?";
@@ -381,7 +401,7 @@ unsigned __stdcall UploadThread(void* pArgs) {
             EnableWindow(hUploadBtn, TRUE);
             return 0;
         }
-        // If YES, UploadDirectory will create it (it uses mkdir -p)
+        // Si SÍ, UploadDirectory el crearà (utilitza mkdir -p)
     }
 
     if (uploader.UploadDirectory(uploadDir, g_config.remoteDir, callback)) {
@@ -394,9 +414,9 @@ unsigned __stdcall UploadThread(void* pArgs) {
     }
 
     if (isZip) {
-        // Cleanup
+        // Neteja
         std::filesystem::remove_all(tempDir);
-        g_selectedZip = ""; // Reset selection after upload
+        g_selectedZip = ""; // Reiniciar selecció després de la pujada
     }
 
     EnableWindow(hUploadBtn, TRUE);
@@ -433,12 +453,12 @@ INT_PTR CALLBACK SettingsDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
             BOOL checked = IsDlgButtonChecked(hDlg, IDC_CHECK_SHOW_PASS);
             HWND hPass = GetDlgItem(hDlg, IDC_EDIT_PASS);
             
-            // Toggle password char
-            // Using EM_SETPASSWORDCHAR is simpler than changing styles on the fly
-            // Default password char is usually a bullet (0x25CF) or asterisk
-            // But if we just want to show/hide, 0 removes it.
-            // To restore, we can use '*' or just reset the style?
-            // Let's try removing/adding ES_PASSWORD style.
+            // Alternar caràcter de contrasenya
+            // Utilitzar EM_SETPASSWORDCHAR és més simple que canviar estils al vol
+            // El caràcter de contrasenya per defecte sol ser una vinyeta (0x25CF) o asterisc
+            // Però si només volem mostrar/amagar, 0 l'elimina.
+            // Per restaurar, podem utilitzar '*' o simplement reiniciar l'estil?
+            // Provem eliminant/afegint l'estil ES_PASSWORD.
             
             /*
             LONG style = GetWindowLong(hPass, GWL_STYLE);
@@ -449,7 +469,7 @@ INT_PTR CALLBACK SettingsDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
             InvalidateRect(hPass, NULL, TRUE);
             */
             
-            // Simpler approach:
+            // Enfocament més simple:
             SendMessage(hPass, EM_SETPASSWORDCHAR, checked ? 0 : (WPARAM)'*', 0);
             InvalidateRect(hPass, NULL, TRUE);
             return (INT_PTR)TRUE;

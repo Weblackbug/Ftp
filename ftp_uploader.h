@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////////////
+// Autor: Sergi Serrano Pérez , WeBlackbug 1987 - 2024 Canovelles - Granollers..   //
+// Archivo: ftp_uploader.h                                                         //
+// Licencia: Libre distribución.                                                   //
+/////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 #include <string>
 #include <vector>

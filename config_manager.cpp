@@ -1,9 +1,15 @@
+/////////////////////////////////////////////////////////////////////////////////////
+// Autor: Sergi Serrano Pérez , WeBlackbug 1987 - 2024 Canovelles - Granollers..   //
+// Archivo: config_manager.cpp                                                     //
+// Licencia: Libre distribución.                                                   //
+/////////////////////////////////////////////////////////////////////////////////////
+
 #include "config_manager.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 
-// Simple trim
+// Retall simple
 static std::string trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \t\r\n");
     if (std::string::npos == first) return str;
@@ -11,7 +17,7 @@ static std::string trim(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
-// Simple unquote
+// Treure cometes simple
 static std::string unquote(std::string str) {
     str = trim(str);
     if (str.size() >= 2 && str.front() == '"' && str.back() == '"') {
@@ -22,12 +28,11 @@ static std::string unquote(std::string str) {
 
 AppConfig ConfigManager::LoadConfig(const std::string& filename) {
     AppConfig config;
-    // Defaults
-    config.host = "access999719206.webspace-data.io";
-    config.user = "u115817696";
-    config.pass = "SspSdcAsdMsd-1972";
-    config.pass = "SspSdcAsdMsd-1972";
-    config.localDir = "C:\\xampp\\htdocs\\canal_k";
+    // Valors per defecte
+    config.host = "";
+    config.user = "";
+    config.pass = "";
+    config.localDir = "";
     config.remoteDir = "/";
 
     std::ifstream file(filename);
@@ -39,9 +44,9 @@ AppConfig ConfigManager::LoadConfig(const std::string& filename) {
                 std::string key = trim(line.substr(0, sep));
                 std::string val = unquote(line.substr(sep + 1));
                 
-                // Remove trailing comma if present (pseudo-json)
+                // Eliminar coma final si està present (pseudo-json)
                 if (!val.empty() && val.back() == ',') val.pop_back();
-                val = unquote(val); // Unquote again if needed
+                val = unquote(val); // Treure cometes de nou si cal
 
                 if (key == "\"host\"") config.host = val;
                 else if (key == "\"user\"") config.user = val;
@@ -61,7 +66,7 @@ void ConfigManager::SaveConfig(const std::string& filename, const AppConfig& con
         file << "  \"host\": \"" << config.host << "\",\n";
         file << "  \"user\": \"" << config.user << "\",\n";
         file << "  \"pass\": \"" << config.pass << "\",\n";
-        // Escape backslashes for JSON validity (simple version)
+        // Escapar barres invertides per validesa JSON (versió simple)
         std::string safeDir = config.localDir;
         size_t pos = 0;
         while ((pos = safeDir.find('\\', pos)) != std::string::npos) {
