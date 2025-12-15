@@ -1,9 +1,0 @@
-Cmd: plink.exe -ssh -pw "SspSdcAsdMsd-1972" -batch -hostkey "ssh-ed25519 255 SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q" "u115817696@access999719206.webspace-data.io" "if [ -d \"/hola\" ]; then echo EXISTS; fi"
-Result: 
-Cmd: plink.exe -ssh -pw "SspSdcAsdMsd-1972" -batch -hostkey "ssh-ed25519 255 SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q" "u115817696@access999719206.webspace-data.io" "ls -d \"hola\" 2>&1"
-Result: 
-Cmd: plink.exe -ssh -pw "SspSdcAsdMsd-1972" -batch -hostkey "ssh-ed25519 255 SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q" "u115817696@access999719206.webspace-data.io" "ls -d \"hola\" 2>&1"
-Result: hola
-
-Cmd: plink.exe -ssh -pw "SspSdcAsdMsd-1972" -batch -hostkey "ssh-ed25519 255 SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q" "u115817696@access999719206.webspace-data.io" "ls -d \"hola\" 2>&1"
-Result: 
