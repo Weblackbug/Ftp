@@ -1,5 +1,0 @@
-/////////////////////////////////////////////////////////////////////////////////////
-// Autor: Sergi Serrano Pérez , WeBlackbug 1987 - 2024 Canovelles - Granollers..   //
-// Archivo: [NOMBRE_DEL_ARCHIVO]                                                   //
-// Licencia: Libre distribución.                                                   //
-/////////////////////////////////////////////////////////////////////////////////////
